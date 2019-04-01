@@ -53,7 +53,7 @@
         android:id="@+id/headingTextView"
         android:layout_width="0dp"
         android:layout_height="41dp"
-        android:layout_marginTop="59dp"
+        android:layout_marginTop="150dp"
         android:layout_marginBottom="88dp"
         android:fontFamily="sans-serif-black"
         android:gravity="center"
@@ -63,6 +63,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>

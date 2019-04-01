@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    void onPressSubmit(View view) {
+    public void onPressSubmit(View view) {
 
         String answer = answerEditText.getText().toString();
 
@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         else{
             try {
                 String url = BASE_URL+"storeAnswer/" + questionIdList.getString(current_question) + "/" + answer;
+                Log.i("urll", url);
                 SubmitAnswer submitAnswer = new SubmitAnswer();
                 submitAnswer.execute(url).get();
                 Toast.makeText(this, "Answer Submitted", Toast.LENGTH_SHORT).show();
