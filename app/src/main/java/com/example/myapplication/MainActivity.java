@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,11 +31,22 @@ public class MainActivity extends AppCompatActivity {
     EditText answerEditText;
     String BASE_URL = "http://192.168.43.235:8000/";
     JSONArray questionIdList;
-    JSONObject Questionresponse;
+    JSONObject questionResponse;
     TextView questionTextView;
     int current_question = 0;
+    ProgressBar appStartProgressBar;
+    LinearLayout appStartProgressLinearLayout;
+    LinearLayout questionLinearLayout;
+    TextView headingTextView;
 
     class QuestionFetch extends AsyncTask<String, Void, JSONObject>{
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            changeVisibility(0);
+            Log.i("loaded", "yes");
+        }
 
         @Override
         protected JSONObject doInBackground(String... strings) {
@@ -70,6 +83,22 @@ public class MainActivity extends AppCompatActivity {
             }
             return new JSONObject();
         }
+
+        @Override
+        protected void onPostExecute(JSONObject response) {
+            super.onPostExecute(response);
+            changeVisibility(1);
+            appStartProgressLinearLayout.setVisibility(View.INVISIBLE);
+            questionResponse = response;
+
+            try {
+                questionIdList = questionResponse.names();
+                questionTextView.setText(questionResponse.getString(questionIdList.getString(current_question)));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     @Override
@@ -79,23 +108,16 @@ public class MainActivity extends AppCompatActivity {
 
         questionTextView = findViewById(R.id.questionTextView);
         answerEditText = findViewById(R.id.answerEditText);
+        appStartProgressBar = findViewById(R.id.appStartProgressBar);
+        appStartProgressLinearLayout = findViewById(R.id.appStartProgressLineaerLayout);
+        questionLinearLayout = findViewById(R.id.questionLinearLayout);
+        headingTextView = findViewById(R.id.headingTextView);
 
         QuestionFetch questionFetch = new QuestionFetch();
-        try {
 
-            Questionresponse = questionFetch.execute(BASE_URL+"getTen").get();
-            questionIdList = Questionresponse.names();
-            questionTextView.setText(Questionresponse.getString(questionIdList.getString(current_question)));
+        questionFetch.execute(BASE_URL+"getTen");
 
-            //Toast.makeText(this, questionIdList.toString(), Toast.LENGTH_LONG).show();
-
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        //Toast.makeText(this, questionIdList.toString(), Toast.LENGTH_LONG).show();
 
     }
 
@@ -114,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 submitAnswer.execute(url).get();
                 Toast.makeText(this, "Answer Submitted", Toast.LENGTH_SHORT).show();
                 current_question += 1;
-                questionTextView.setText(Questionresponse.getString(questionIdList.getString(current_question)));
+                questionTextView.setText(questionResponse.getString(questionIdList.getString(current_question)));
                 answerEditText.setText("");
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -128,5 +150,19 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    // Function to make make contents on screen visible and invisible before and after downloading the data
+    // 1: make visible
+    // 0: make invisible
+
+    public void changeVisibility(int flag) {
+
+        if (flag == 1) {
+            questionLinearLayout.setVisibility(View.VISIBLE);
+            headingTextView.setVisibility(View.VISIBLE);
+        } else{
+            questionLinearLayout.setVisibility(View.INVISIBLE);
+            headingTextView.setVisibility(View.INVISIBLE);
+        }
+    }
 
 }

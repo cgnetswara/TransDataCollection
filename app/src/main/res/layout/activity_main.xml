@@ -6,18 +6,35 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/headingTextView"
+        android:layout_width="match_parent"
+        android:layout_height="37dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="116dp"
+        android:fontFamily="sans-serif-black"
+        android:gravity="center"
+        android:text="Convert to Gondi!"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/questionLinearLayout"
         android:layout_width="wrap_content"
-        android:layout_height="187dp"
-        android:layout_marginTop="88dp"
-        android:layout_marginBottom="356dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:weightSum="5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/headingTextView">
+        app:layout_constraintTop_toBottomOf="@+id/headingTextView"
+        app:layout_constraintVertical_bias="0.331">
 
         <TextView
             android:id="@+id/questionTextView"
@@ -49,21 +66,31 @@
             android:text="submit" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/headingTextView"
-        android:layout_width="0dp"
-        android:layout_height="41dp"
-        android:layout_marginTop="150dp"
-        android:layout_marginBottom="88dp"
-        android:fontFamily="sans-serif-black"
-        android:gravity="center"
-        android:text="Convert to Gondi!"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/appStartProgressLineaerLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ProgressBar
+            android:id="@+id/appStartProgressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="116dp"
+            android:layout_height="92dp"
+            android:layout_marginTop="56dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Please wait..."
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>
