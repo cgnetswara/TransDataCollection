@@ -36,7 +36,7 @@ import com.example.myapplication.SubmitAnswer;
 public class MainActivity extends AppCompatActivity {
 
     EditText answerEditText;
-    String BASE_URL = "http://172.16.102.203:8000/";
+    String BASE_URL = "http://172.16.101.19:8000/";
     JSONArray questionIdList;
     JSONObject questionResponse;
     TextView questionTextView;
