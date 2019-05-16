@@ -2,11 +2,13 @@ package com.example.myapplication;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
@@ -36,11 +38,12 @@ import com.example.myapplication.SubmitAnswer;
 public class MainActivity extends AppCompatActivity {
 
     EditText answerEditText;
-    String BASE_URL = "http://172.16.101.19:8000/";
+    String BASE_URL = "http://172.16.102.204:8000/";
     JSONArray questionIdList;
     JSONObject questionResponse;
     TextView questionTextView;
-    int current_question = 0;
+    TextView countTextView;
+    int current_question = 0; //The current question on 0-9
     ProgressBar appStartProgressBar;
     LinearLayout appStartProgressLinearLayout;
     LinearLayout questionLinearLayout;
@@ -51,13 +54,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
             Id = telephonyManager.getDeviceId();
             //TODO: take care of depreciation of getDEviceId
         }
     }
 
-    class QuestionFetch extends AsyncTask<String, Void, JSONObject>{
+    class QuestionFetch extends AsyncTask<String, Void, JSONObject> {
 
         @Override
         protected void onPreExecute() {
@@ -78,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 InputStreamReader reader = new InputStreamReader(inputStream);
                 int data = reader.read();
 
-                while(data != -1){
+                while (data != -1) {
                     response += (char) data;
                     data = reader.read();
                 }
@@ -89,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            if (response.length() > 0){
+            if (response.length() > 0) {
                 try {
                     JSONObject jsonObject = new JSONObject(response);
                     return jsonObject;
@@ -106,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(JSONObject response) {
             super.onPostExecute(response);
             changeVisibility(1);
-            appStartProgressLinearLayout.setVisibility(View.INVISIBLE);
 
             try {
                 questionResponse = response.getJSONObject("words");
@@ -130,22 +132,32 @@ public class MainActivity extends AppCompatActivity {
         appStartProgressLinearLayout = findViewById(R.id.appStartProgressLineaerLayout);
         questionLinearLayout = findViewById(R.id.questionLinearLayout);
         headingTextView = findViewById(R.id.headingTextView);
+        countTextView = findViewById(R.id.countTextView);
 
         telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
         // checking for permissions
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
-        }
-        else {
+        } else {
             Id = telephonyManager.getDeviceId();
         }
 
-        QuestionFetch questionFetch = new QuestionFetch();
-
-        questionFetch.execute(BASE_URL+"getTen/" + Id);
+        fetchQuestions();
 
         //Toast.makeText(this, questionIdList.toString(), Toast.LENGTH_LONG).show();
+
+    }
+
+    public void fetchQuestions() {
+
+        QuestionFetch questionFetch = new QuestionFetch();
+
+        questionFetch.execute(BASE_URL + "getTen/" + Id);
+
+        current_question = 0;
+
+        countTextView.setText("1/10");
 
     }
 
@@ -153,19 +165,28 @@ public class MainActivity extends AppCompatActivity {
 
         String answer = answerEditText.getText().toString();
 
-        if (answer.length() == 0){
+        if (answer.length() == 0) {
             Toast.makeText(this, "Please enter a answer", Toast.LENGTH_SHORT).show();
-        }
-        else{
+        } else {
+
+
             try {
-                String url = BASE_URL+"submitAnswer/" + Id + "/" + questionIdList.getString(current_question) + "/" + answer;
+                String url = BASE_URL + "submitAnswer/" + Id + "/" + questionIdList.getString(current_question) + "/" + answer; //Id is the deviceId of phone
                 Log.i("urll", url);
                 SubmitAnswer submitAnswer = new SubmitAnswer();
                 submitAnswer.execute(url).get();
                 Toast.makeText(this, "Answer Submitted", Toast.LENGTH_SHORT).show();
                 current_question += 1;
-                questionTextView.setText(questionResponse.getString(questionIdList.getString(current_question)));
-                answerEditText.setText("");
+
+                if (current_question >= 10) {
+                    buildSuccessBox();
+                } else {
+
+                    questionTextView.setText(questionResponse.getString(questionIdList.getString(current_question)));
+                    answerEditText.setText("");
+                    // Setting the text for the counter
+                    countTextView.setText(String.format("%s/10", Integer.toString(current_question + 1)));
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
                 Toast.makeText(this, "Something went wrong!", Toast.LENGTH_SHORT).show();
@@ -174,7 +195,27 @@ public class MainActivity extends AppCompatActivity {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
+
+
         }
+
+    }
+
+    public void buildSuccessBox() {
+        // build a congratulations alert box
+
+        new AlertDialog.Builder(MainActivity.this)
+                .setIcon(R.drawable.thumbsup)
+                .setTitle("Well Done!")
+                .setMessage("You have just completed a set of 10 quesetions!! Way to go! Load next set?")
+                .setPositiveButton("Load It!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        fetchQuestions();
+                    }
+                })
+                .setNegativeButton("No, Thanks", null)
+                .show();
 
     }
 
@@ -187,9 +228,13 @@ public class MainActivity extends AppCompatActivity {
         if (flag == 1) {
             questionLinearLayout.setVisibility(View.VISIBLE);
             headingTextView.setVisibility(View.VISIBLE);
-        } else{
-            questionLinearLayout.setVisibility(View.INVISIBLE);
-            headingTextView.setVisibility(View.INVISIBLE);
+            countTextView.setVisibility(View.VISIBLE);
+            appStartProgressLinearLayout.setVisibility(View.GONE);
+        } else {
+            questionLinearLayout.setVisibility(View.GONE);
+            headingTextView.setVisibility(View.GONE);
+            countTextView.setVisibility(View.GONE);
+            appStartProgressLinearLayout.setVisibility(View.VISIBLE);
         }
     }
 

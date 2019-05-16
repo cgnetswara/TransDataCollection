@@ -7,16 +7,29 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/countTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="1/10"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        app:layout_constraintBottom_toTopOf="@+id/headingTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
         android:id="@+id/headingTextView"
         android:layout_width="match_parent"
-        android:layout_height="37dp"
-        android:layout_marginStart="8dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="116dp"
-        android:fontFamily="sans-serif-black"
         android:gravity="center"
         android:text="Convert to Gondi!"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:textSize="30sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+        android:textColor="@android:color/background_dark"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -56,7 +69,7 @@
             android:inputType="textPersonName" />
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/showResultsButton"
             android:layout_width="104dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -64,6 +77,21 @@
             android:layout_marginRight="161dp"
             android:onClick="onPressSubmit"
             android:text="submit" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:gravity="center"
+            tools:text="Anurag: 2
+Translation: 3
+Translation: 4" />
+        <Button
+            android:id="@+id/nextQuestionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NEXT"
+            android:layout_gravity="center"/>
     </LinearLayout>
 
 
@@ -72,6 +100,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -93,21 +122,5 @@
             android:textStyle="bold" />
 
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="0dp"
-        android:layout_height="37dp"
-        android:layout_marginStart="169dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="170dp"
-        android:layout_marginBottom="63dp"
-        android:text="TextView"
-        android:textAlignment="center"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/headingTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
