@@ -31,12 +31,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
 
     EditText answerEditText;
-    String BASE_URL = "http://172.16.102.204:8000/";
+    String BASE_URL = "http://192.168.43.235:8000/";
     JSONArray questionIdList;
     JSONObject questionResponse;
     TextView questionTextView;
@@ -58,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
             Id = telephonyManager.getDeviceId();
+            fetchQuestions();
             //TODO: take care of depreciation of getDeviceId
         }
     }
@@ -175,9 +175,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
         } else {
             Id = telephonyManager.getDeviceId();
+            fetchQuestions();
         }
-
-        fetchQuestions();
 
         //Toast.makeText(this, questionIdList.toString(), Toast.LENGTH_LONG).show();
 
