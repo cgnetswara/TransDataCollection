@@ -81,11 +81,34 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:gravity="center"
+            android:text="Most Submissions"
+            android:layout_margin="10dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title" />
+
+        <TextView
+            android:id="@+id/mostSubmissionsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             tools:text="Anurag: 2
-Translation: 3
-Translation: 4" />
+Translation: 3" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Your Submission Count"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+            android:gravity="center"
+            android:layout_margin="10dp"/>
+        <TextView
+            android:id="@+id/currentSubmissionTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="An Example: 42"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:layout_marginBottom="10dp"/>
         <Button
             android:id="@+id/nextQuestionButton"
             android:layout_width="wrap_content"

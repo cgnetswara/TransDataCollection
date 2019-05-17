@@ -12,11 +12,16 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class SubmitAnswer extends AsyncTask<String, Void, String> {
+public class SubmitAnswer extends AsyncTask<String, Void, JSONObject> {
 
+    OnTaskCompleted onTaskCompleted = null;
+
+    public SubmitAnswer(OnTaskCompleted onTaskCompleted) {
+        this.onTaskCompleted = onTaskCompleted;
+    }
 
     @Override
-    protected String doInBackground(String... strings) {
+    protected JSONObject doInBackground(String... strings) {
         String response = "";
 
         try {
@@ -38,6 +43,22 @@ public class SubmitAnswer extends AsyncTask<String, Void, String> {
             e.printStackTrace();
         }
 
-        return response;
+        if (response.length() > 0) {
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                return jsonObject;
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return new JSONObject();
+    }
+
+    @Override
+    protected void onPostExecute(JSONObject jsonObject) {
+        super.onPostExecute(jsonObject);
+        onTaskCompleted.onTaskCompleted(jsonObject);
     }
 }

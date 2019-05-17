@@ -30,12 +30,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-import com.example.myapplication.SubmitAnswer;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
 
     EditText answerEditText;
     String BASE_URL = "http://172.16.102.204:8000/";
@@ -49,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout questionLinearLayout;
     TextView headingTextView;
     TelephonyManager telephonyManager;
+    TextView statisticsTextView; //it displays the most submissions stats for submitted answer
+    TextView currentSubmissionTextView; //it displays current submissions stats
     String Id;
 
     @Override
@@ -56,8 +55,36 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
             Id = telephonyManager.getDeviceId();
-            //TODO: take care of depreciation of getDEviceId
+            //TODO: take care of depreciation of getDeviceId
         }
+    }
+
+    @Override
+    public void onTaskCompleted(JSONObject responseJSONObject) {
+        Log.i("insideTask", "yes");
+        try {
+            JSONObject topAnswers = responseJSONObject.getJSONObject("topAnswers");
+            JSONObject userAnswer = responseJSONObject.getJSONObject("userAnswer");
+            JSONArray topAnswersKey = topAnswers.names();
+            JSONArray userAnswerKey = userAnswer.names();
+
+            String topAnswersString = "";
+            for (int i=0; i< topAnswers.length(); i++) {
+                String key = topAnswersKey.getString((i));
+                topAnswersString += key + ": " + topAnswers.getInt(key) + "\n";
+            }
+
+            Log.i("answers", topAnswers.toString());
+            statisticsTextView.setText(topAnswersString);
+
+            String userAnswerString = userAnswerKey.getString(0) + ": " + userAnswer.getInt(userAnswerKey.getString(0));
+            currentSubmissionTextView.setText(userAnswerString);
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     class QuestionFetch extends AsyncTask<String, Void, JSONObject> {
@@ -133,6 +160,8 @@ public class MainActivity extends AppCompatActivity {
         questionLinearLayout = findViewById(R.id.questionLinearLayout);
         headingTextView = findViewById(R.id.headingTextView);
         countTextView = findViewById(R.id.countTextView);
+        statisticsTextView = findViewById(R.id.mostSubmissionsTextView);
+        currentSubmissionTextView = findViewById(R.id.currentSubmissionTextView);
 
         telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
@@ -173,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 String url = BASE_URL + "submitAnswer/" + Id + "/" + questionIdList.getString(current_question) + "/" + answer; //Id is the deviceId of phone
                 Log.i("urll", url);
-                SubmitAnswer submitAnswer = new SubmitAnswer();
+                SubmitAnswer submitAnswer = new SubmitAnswer(this);
                 submitAnswer.execute(url).get();
                 Toast.makeText(this, "Answer Submitted", Toast.LENGTH_SHORT).show();
                 current_question += 1;
