@@ -92,6 +92,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:text="Please provide an input"
             tools:text="Anurag: 2
 Translation: 3" />
         <TextView
@@ -106,6 +107,7 @@ Translation: 3" />
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="An Example: 42"
+            android:text="Please provide an input"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:layout_marginBottom="10dp"/>

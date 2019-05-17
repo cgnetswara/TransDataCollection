@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
     TelephonyManager telephonyManager;
     TextView statisticsTextView; //it displays the most submissions stats for submitted answer
     TextView currentSubmissionTextView; //it displays current submissions stats
+    Button nextQuestionButton;
+    Boolean submitPressed = false;
     String Id;
 
     @Override
@@ -79,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
 
             String userAnswerString = userAnswerKey.getString(0) + ": " + userAnswer.getInt(userAnswerKey.getString(0));
             currentSubmissionTextView.setText(userAnswerString);
+            Toast.makeText(this, "Answer Submitted", Toast.LENGTH_SHORT).show();
 
 
         } catch (JSONException e) {
@@ -162,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
         countTextView = findViewById(R.id.countTextView);
         statisticsTextView = findViewById(R.id.mostSubmissionsTextView);
         currentSubmissionTextView = findViewById(R.id.currentSubmissionTextView);
+        nextQuestionButton = findViewById(R.id.nextQuestionButton);
 
         telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
@@ -176,6 +181,13 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
 
         //Toast.makeText(this, questionIdList.toString(), Toast.LENGTH_LONG).show();
 
+        nextQuestionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onPressnNext();
+            }
+        });
+
     }
 
     public void fetchQuestions() {
@@ -188,47 +200,66 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
 
         countTextView.setText("1/10");
 
+        resetStatsTextViews();
+
     }
+
 
     public void onPressSubmit(View view) {
 
         String answer = answerEditText.getText().toString();
 
-        if (answer.length() == 0) {
-            Toast.makeText(this, "Please enter a answer", Toast.LENGTH_SHORT).show();
+        if (submitPressed) {
+            Toast.makeText(this, "You already have made a submission. Please click next.", Toast.LENGTH_LONG).show();
         } else {
 
+            submitPressed = true;
 
-            try {
-                String url = BASE_URL + "submitAnswer/" + Id + "/" + questionIdList.getString(current_question) + "/" + answer; //Id is the deviceId of phone
-                Log.i("urll", url);
-                SubmitAnswer submitAnswer = new SubmitAnswer(this);
-                submitAnswer.execute(url).get();
-                Toast.makeText(this, "Answer Submitted", Toast.LENGTH_SHORT).show();
-                current_question += 1;
+            if (answer.length() == 0) {
+                Toast.makeText(this, "Please enter a answer", Toast.LENGTH_SHORT).show();
+            } else {
 
-                if (current_question >= 10) {
-                    buildSuccessBox();
-                } else {
 
-                    questionTextView.setText(questionResponse.getString(questionIdList.getString(current_question)));
-                    answerEditText.setText("");
-                    // Setting the text for the counter
-                    countTextView.setText(String.format("%s/10", Integer.toString(current_question + 1)));
+                try {
+                    String url = BASE_URL + "submitAnswer/" + Id + "/" + questionIdList.getString(current_question) + "/" + answer; //Id is the deviceId of phone
+                    Log.i("urll", url);
+                    SubmitAnswer submitAnswer = new SubmitAnswer(this);
+                    submitAnswer.execute(url);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Something went wrong!", Toast.LENGTH_SHORT).show();
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Toast.makeText(this, "Something went wrong!", Toast.LENGTH_SHORT).show();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+
+
             }
-
-
         }
 
     }
+
+    public void onPressnNext() {
+
+        if (current_question >= 9) {
+            buildSuccessBox();
+        } else if (submitPressed) {
+            current_question += 1;
+            submitPressed = false;
+
+            try {
+                questionTextView.setText(questionResponse.getString(questionIdList.getString(current_question)));
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
+            }
+            answerEditText.setText("");
+            // Setting the text for the counter
+            countTextView.setText(String.format("%s/10", Integer.toString(current_question + 1)));
+            resetStatsTextViews();
+
+        } else{
+            Toast.makeText(this, "Please Submit the question first", Toast.LENGTH_LONG).show();
+        }
+    }
+
 
     public void buildSuccessBox() {
         // build a congratulations alert box
@@ -243,7 +274,12 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
                         fetchQuestions();
                     }
                 })
-                .setNegativeButton("No, Thanks", null)
+                .setNegativeButton("No, Thanks. Exit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finishAndRemoveTask();
+                    }
+                })
                 .show();
 
     }
@@ -265,6 +301,11 @@ public class MainActivity extends AppCompatActivity implements OnTaskCompleted {
             countTextView.setVisibility(View.GONE);
             appStartProgressLinearLayout.setVisibility(View.VISIBLE);
         }
+    }
+
+    public void resetStatsTextViews() {
+        currentSubmissionTextView.setText("Please provide an input");
+        statisticsTextView.setText("Please provide an input.");
     }
 
 }
